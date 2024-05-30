@@ -83,3 +83,15 @@ Documentation is created:
 ### 5. Optionally test the code to demonstrate end-to-end functionality
 
 ![End-to-End test](./media/basicDemo/13_testrun.png)
+
+### 6. Persisting the Order Object to Cosmos DB
+
+To enhance our REST API, we've now included functionality to persist the order object to Cosmos DB. This involves initializing a Cosmos DB client, parsing the HTTP request into an `Order` object, and then persisting this object to Cosmos DB. Here's a brief overview of the steps involved:
+
+1. **Initialize Cosmos DB Client**: At the start of our function, we initialize a Cosmos DB client using the connection string stored in our local settings.
+
+2. **Parse HTTP Request**: We parse the incoming HTTP request to extract the order details and serialize them into an `Order` object.
+
+3. **Persist to Cosmos DB**: Finally, we use the Cosmos DB client to persist the `Order` object to our database.
+
+This addition ensures that every order processed by our REST API is now stored in Cosmos DB, allowing for further processing and analysis down the line.
