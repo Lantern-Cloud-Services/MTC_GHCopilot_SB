@@ -1,23 +1,50 @@
 //Prompt: create a bicep deployment that creates a function app
 
+param location string = resourceGroup().location
 param functionAppName string
-param location string = 'westus'
+param storageAccountName string
+param appServicePlanName string
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
+  name: storageAccountName
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+}
+
+resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
+  name: appServicePlanName
+  location: location
+  sku: {
+    name: 'Y1'
+    tier: 'Dynamic'
+  }
+}
 
 resource functionApp 'Microsoft.Web/sites@2021-02-01' = {
   name: functionAppName
   location: location
   kind: 'functionapp'
   properties: {
-    serverFarmId: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{appServicePlanName}'
+    serverFarmId: appServicePlan.id
     siteConfig: {
       appSettings: [
         {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'dotnet'
+          name: 'AzureWebJobsStorage'
+          value: storageAccount.properties.primaryEndpoints.blob
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~3'
+        }
+        {
+          name: 'WEBSITE_NODE_DEFAULT_VERSION'
+          value: '~14'
         }
       ]
     }
   }
 }
 
-output functionAppUrl string = functionApp.properties.defaultHostName

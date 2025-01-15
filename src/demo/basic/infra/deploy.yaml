@@ -1,6 +1,5 @@
 #Prompt: create a yaml github workflow file to deploy the function app to Azure
-
-name: Azure Function App Deployment
+name: Deploy to Azure Function App
 
 on:
   push:
@@ -8,21 +7,28 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Azure CLI
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
 
-      - name: Deploy to Azure Function App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: <your-function-app-name>
-          slot-name: <your-slot-name> # Optional, remove this line if not using slots
-          publish-profile: ${{ secrets.AZURE_FUNCTION_APP_PUBLISH_PROFILE }}
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build project
+      run: npm run build
+
+    - name: 'Deploy to Azure WebApp'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'YOUR_FUNCTION_APP_NAME'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
