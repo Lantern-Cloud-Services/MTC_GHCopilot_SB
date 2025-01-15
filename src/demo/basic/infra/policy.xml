@@ -1,1 +1,19 @@
 <!--Prompt: create an APIM policy to set the User-GUID and Correlation-ID headers -->
+<inbound>
+    <base />
+    <set-header name="User-GUID" exists-action="override">
+        <value>@(context.Request.Headers.GetValueOrDefault("User-GUID", Guid.NewGuid().ToString()))</value>
+    </set-header>
+    <set-header name="Correlation-ID" exists-action="override">
+        <value>@(context.Request.Headers.GetValueOrDefault("Correlation-ID", Guid.NewGuid().ToString()))</value>
+    </set-header>
+</inbound>
+<backend>
+    <base />
+</backend>
+<outbound>
+    <base />
+</outbound>
+<on-error>
+    <base />
+</on-error>
